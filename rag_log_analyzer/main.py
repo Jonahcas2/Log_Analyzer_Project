@@ -48,3 +48,17 @@ if db_exists and rebuild_choice != 'y':
     db = Chroma(persist_directory=db_path, embedding_function=embeddings)
 else:
     print("Creating a new vector database...")
+    db = Chroma.from_documents(
+        chunks, embeddings,
+        persist_directory=db_path,
+        collection_metadata={"hnsw:space": "cosine"}
+    )
+    print(" Vector database created and saved.")
+
+# RAG Chain Setup
+retriever = db.as_retriever()
+llm = OllamaLLM(model="mistral")
+qa = PebbloRetrievalQA.from_chain_type(
+    llm=llm, retriever=retriever, 
+    return_source_documents=True
+)
