@@ -9,6 +9,7 @@ from langchain_community.vectorstores import Chroma
 from langchain_community.chains import PebbloRetrievalQA
 from langchain_ollama import OllamaLLM
 
+# Directory Input and Validation
 try:
     LOG_DIRECTORY = input("-> Enter the path to the log directory: ")
     if not os.path.isdir(LOG_DIRECTORY):
@@ -18,6 +19,7 @@ except KeyboardInterrupt:
     print("\n\n Exiting...")
     sys.exit(0)
 
+# Document Loading and Processing
 try:
     print(f" Loading log files from {LOG_DIRECTORY}...")
     docs = load_sop_files(LOG_DIRECTORY)
@@ -25,3 +27,24 @@ try:
 except KeyboardInterrupt:
     print("\n\n File loading interrupted by user. Exiting...")
     sys.exit(0)
+
+# Vector Database Creation
+print(f" Creating vector database with {len(chunks)} log entries...")
+print(" This may take several minutes for large files...")
+
+# Check if database already exists
+db_path = "./chroma_db"
+db_exists = os.path.exists(db_path)
+if db_exists:
+    rebuild_choice = input(f" Vector database already exists. Rebuild? (y/n): ").strip().lower()
+# Optimized embedding settings
+embeddings = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2",
+    model_kwargs={'device': 'cpu'},
+    encode_kwargs={'normalize_embeddings': True, 'batch_size': 32}
+)
+if db_exists and rebuild_choice != 'y':
+    print(" Found existing vector database, loading...")
+    db = Chroma(persist_directory=db_path, embedding_function=embeddings)
+else:
+    print("Creating a new vector database...")
