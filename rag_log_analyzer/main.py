@@ -3,7 +3,7 @@ import os
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-from .utils.loaders import load_sop_files
+from utils.loaders import load_sop_files
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_community.chains import PebbloRetrievalQA
@@ -29,7 +29,7 @@ except KeyboardInterrupt:
     sys.exit(0)
 
 # Vector Database Creation
-print(f" Creating vector database with {len(chunks)} log entries...")
+print(f" Creating vector database with {len(docs)} log entries...")
 print(" This may take several minutes for large files...")
 
 # Check if database already exists
@@ -49,7 +49,7 @@ if db_exists and rebuild_choice != 'y':
 else:
     print("Creating a new vector database...")
     db = Chroma.from_documents(
-        chunks, embeddings,
+        docs, embeddings,
         persist_directory=db_path,
         collection_metadata={"hnsw:space": "cosine"}
     )
@@ -84,3 +84,11 @@ try:
 except KeyboardInterrupt:
     print("\n\n Goodbye! Exiting...")
     sys.exit(0)
+
+# Response Display & Source Attribution
+print("\n Assistant:\n", result["result"])
+print("\n Sources:")
+for doc in result["source_documents"]:
+    source = doc.metadata.get('source')
+    line_number = doc.metadata.get('line_number')
+    print(f" - {source}{f' (Line {line_number})' if line_number else ''}")
