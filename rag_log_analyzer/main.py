@@ -62,3 +62,25 @@ qa = PebbloRetrievalQA.from_chain_type(
     llm=llm, retriever=retriever, 
     return_source_documents=True
 )
+
+# Interactive Query Loop w/ Prompt Engineering
+try:
+    while True:
+        query = input("\n You (e.g. 'What errors occured in the last hour?'): ")
+        if query.lower() in ("exit", "quit"):
+            break
+
+        # LLM prompt engineering (gaslighting the AI)
+        analysis_query = (
+            "You are an expert log analyser. Review the provided log entries and answer the user's question. "
+            "Provide a concise summary, highlight any potential issues, and mention the relevant source log files. "
+            f"Question: {query}" )
+
+        try:
+            result = qa.invoke
+        except KeyboardInterrupt:
+            print("\n️  Query processing interrupted. You can ask another question.")
+            continue
+except KeyboardInterrupt:
+    print("\n\n Goodbye! Exiting...")
+    sys.exit(0)
