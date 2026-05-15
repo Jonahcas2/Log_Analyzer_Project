@@ -1,4 +1,7 @@
+from langchain_community.document_loaders import DirectoryLoader, TextLoader
+from langchain_core.documents import Document
 import os
+
 
 def load_sop_files(directory: str):
     # Defines supported file extensions
@@ -24,10 +27,10 @@ def load_sop_files(directory: str):
                         line_count = 0
                         for i, line in enumerate(f):
                             if line.strip(): # Skip empty lines
-                                docs.append({
-                                    "page_content": line.strip(),
-                                    "metadata": {"source": path, "line_number": i + 1}
-                                })
+                                docs.append(Document(
+                                    page_content=line.strip(),
+                                    metadata={"source": path, "line_number": i + 1}
+                                ))
                                 line_count += 1
                                 total_lines += 1
                                 # Show progress for large files

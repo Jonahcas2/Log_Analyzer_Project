@@ -6,7 +6,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 from utils.loaders import load_sop_files
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
-from langchain_community.chains import PebbloRetrievalQA
+from langchain_classic.chains import RetrievalQA
 from langchain_ollama import OllamaLLM
 
 # Directory Input and Validation
@@ -58,7 +58,7 @@ else:
 # RAG Chain Setup
 retriever = db.as_retriever()
 llm = OllamaLLM(model="mistral")
-qa = PebbloRetrievalQA.from_chain_type(
+qa = RetrievalQA.from_chain_type(
     llm=llm, retriever=retriever, 
     return_source_documents=True
 )
