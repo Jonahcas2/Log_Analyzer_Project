@@ -77,18 +77,20 @@ try:
             f"Question: {query}" )
 
         try:
-            result = qa.invoke
+            result = qa.invoke({"query": analysis_query})
         except KeyboardInterrupt:
             print("\n️  Query processing interrupted. You can ask another question.")
             continue
+
+        # Response Display & Source Attribution
+        print("\n Assistant:\n", result["result"])
+        print("\n Sources:")
+        for doc in result["source_documents"]:
+            source = doc.metadata.get('source')
+            line_number = doc.metadata.get('line_number')
+            print(f" - {source}{f' (Line {line_number})' if line_number else ''}")
 except KeyboardInterrupt:
     print("\n\n Goodbye! Exiting...")
     sys.exit(0)
 
-# Response Display & Source Attribution
-print("\n Assistant:\n", result["result"])
-print("\n Sources:")
-for doc in result["source_documents"]:
-    source = doc.metadata.get('source')
-    line_number = doc.metadata.get('line_number')
-    print(f" - {source}{f' (Line {line_number})' if line_number else ''}")
+
