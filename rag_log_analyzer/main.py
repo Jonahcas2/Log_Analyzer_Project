@@ -9,6 +9,19 @@ from langchain_chroma import Chroma
 from langchain_classic.chains import RetrievalQA
 from langchain_ollama import OllamaLLM
 
+# Making it look pretty 
+print("_______________________________________________________________________________")
+print(" _ __ __ _  __ _    | | ___   __ _      __ _ _ __   __ _| |_   _ ___  ___ _ __")
+print("| '__/ _` |/ _` |___| |/ _ \\ / _` |___ / _` | '_ \\ / _` | | | | / __|/ _ | '__|")
+print("| | | (_| | (_| |___| | (_) | (_| |___| (_| | | | | (_| | | |_| \\__ |  __| |")
+print("|_|  \\__,_|\\__, |   |_|\\___/ \\__, |    \\__,_|_| |_|\\__,_|_|\\__, |___/\\___|_|")
+print("           |___/              |___/                         |___/")
+print("_______________________________________________________________________________")
+print("                                                                                          ")
+print("                                                                                          ")
+print("                                                                                          ") 
+
+
 # Directory Input and Validation
 try:
     LOG_DIRECTORY = input("-> Enter the path to the log directory: ")
