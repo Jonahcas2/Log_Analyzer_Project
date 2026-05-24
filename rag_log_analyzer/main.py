@@ -1,13 +1,36 @@
 import sys
 import os
+import subprocess
+import time
+import httpx
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
-
 from utils.loaders import load_sop_files
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain_classic.chains import RetrievalQA
 from langchain_ollama import OllamaLLM
+
+# Ensure Ollama is running
+def check_ollama():
+    try:
+        httpx.get("http://localhost:11434/api/tags", timeout=2)
+        print(" Ollama is running.")
+    except httpx.ConnectError:
+        print("Starting Ollama...")
+        subprocess.Popen(["ollama", "serve"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(5)  # Wait for Ollama to start
+
+# Ensure the model is pulled
+def model_pull(model: str):
+    result = subprocess.run(["ollama", "list"], capture_output=True, text=True)
+    if model not in result.stdout:
+        print(f" Pulling model '{model}' (this may take a while)...")
+        subprocess.run(["ollama", "pull", model])
+        print(f" Model '{model}' ready.")
+
+check_ollama()
+model_pull("mistral")
 
 # Making it look pretty 
 print("_______________________________________________________________________________")
@@ -48,6 +71,7 @@ print(" This may take several minutes for large files...")
 # Check if database already exists
 db_path = "./chroma_db"
 db_exists = os.path.exists(db_path)
+rebuild_choice = 'n'
 if db_exists:
     rebuild_choice = input(f" Vector database already exists. Rebuild? (y/n): ").strip().lower()
 # Optimized embedding settings
@@ -69,7 +93,10 @@ else:
     print(" Vector database created and saved.")
 
 # RAG Chain Setup
-retriever = db.as_retriever()
+retriever = db.as_retriever(
+    search_type="mmr",
+    search_kywargs={"k": 10, "fetch_k": 30}
+)
 llm = OllamaLLM(model="mistral")
 qa = RetrievalQA.from_chain_type(
     llm=llm, retriever=retriever, 

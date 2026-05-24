@@ -2,5 +2,8 @@ langchain
 langchain-community
 langchain-ollama
 langchain-huggingface
+langchain-chroma
+langchain-classic
 chromadb
 sentence-transformers
+httpx
